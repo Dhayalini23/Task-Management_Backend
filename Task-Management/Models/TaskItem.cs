@@ -14,6 +14,7 @@ namespace Task_Management.Models
         public string Priority { get; set; }
         public int? AssigneeId { get; set; }
         public User? User { get; set; }
-        //public object Assignee { get; internal set; }
+
+        public ICollection<CheckList>? CheckLists { get; set; }
     }
 }

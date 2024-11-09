@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using System.Text.Json.Serialization;
 using Task_Management.Database;
 
@@ -27,10 +29,17 @@ builder.Services.AddCors(option =>
 
 builder.Services.AddDbContext<TaskContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]));
+builder.Services.AddAuthentication()
+    .AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters
+    {
+        IssuerSigningKey = key,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+    });
+
+
 var app = builder.Build();
-
-
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

@@ -12,8 +12,8 @@ using Task_Management.Database;
 namespace Task_Management.Migrations
 {
     [DbContext(typeof(TaskContext))]
-    [Migration("20241026100943_adfd")]
-    partial class adfd
+    [Migration("20241103045309_ingh")]
+    partial class ingh
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -56,6 +56,30 @@ namespace Task_Management.Migrations
                     b.ToTable("Address");
                 });
 
+            modelBuilder.Entity("Task_Management.Models.CheckList", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool?>("IsDone")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TaskId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TaskId");
+
+                    b.ToTable("CheckList");
+                });
+
             modelBuilder.Entity("Task_Management.Models.TaskItem", b =>
                 {
                     b.Property<int>("Id")
@@ -82,12 +106,9 @@ namespace Task_Management.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("AssigneeId");
 
                     b.ToTable("Tasks");
                 });
@@ -121,6 +142,32 @@ namespace Task_Management.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Task_Management.Models.UserLogin", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserLogins");
+                });
+
             modelBuilder.Entity("Task_Management.Models.Address", b =>
                 {
                     b.HasOne("Task_Management.Models.User", "User")
@@ -132,13 +179,30 @@ namespace Task_Management.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Task_Management.Models.CheckList", b =>
+                {
+                    b.HasOne("Task_Management.Models.TaskItem", "TaskItem")
+                        .WithMany("CheckLists")
+                        .HasForeignKey("TaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TaskItem");
+                });
+
             modelBuilder.Entity("Task_Management.Models.TaskItem", b =>
                 {
                     b.HasOne("Task_Management.Models.User", "User")
                         .WithMany("Tasks")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("AssigneeId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Task_Management.Models.TaskItem", b =>
+                {
+                    b.Navigation("CheckLists");
                 });
 
             modelBuilder.Entity("Task_Management.Models.User", b =>

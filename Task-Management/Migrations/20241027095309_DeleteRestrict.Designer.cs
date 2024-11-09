@@ -12,8 +12,8 @@ using Task_Management.Database;
 namespace Task_Management.Migrations
 {
     [DbContext(typeof(TaskContext))]
-    [Migration("20241026051353_ADD")]
-    partial class ADD
+    [Migration("20241027095309_DeleteRestrict")]
+    partial class DeleteRestrict
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,6 +25,37 @@ namespace Task_Management.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Task_Management.Models.Address", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AddressLine1")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AddressLine2")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Address");
+                });
+
             modelBuilder.Entity("Task_Management.Models.TaskItem", b =>
                 {
                     b.Property<int>("Id")
@@ -32,6 +63,9 @@ namespace Task_Management.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AssigneeId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -49,6 +83,8 @@ namespace Task_Management.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AssigneeId");
 
                     b.ToTable("Tasks");
                 });
@@ -80,6 +116,35 @@ namespace Task_Management.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Task_Management.Models.Address", b =>
+                {
+                    b.HasOne("Task_Management.Models.User", "User")
+                        .WithOne("Address")
+                        .HasForeignKey("Task_Management.Models.Address", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Task_Management.Models.TaskItem", b =>
+                {
+                    b.HasOne("Task_Management.Models.User", "User")
+                        .WithMany("Tasks")
+                        .HasForeignKey("AssigneeId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Task_Management.Models.User", b =>
+                {
+                    b.Navigation("Address")
+                        .IsRequired();
+
+                    b.Navigation("Tasks");
                 });
 #pragma warning restore 612, 618
         }

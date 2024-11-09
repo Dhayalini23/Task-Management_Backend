@@ -5,7 +5,7 @@
 namespace Task_Management.Migrations
 {
     /// <inheritdoc />
-    public partial class ka : Migration
+    public partial class dfs : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

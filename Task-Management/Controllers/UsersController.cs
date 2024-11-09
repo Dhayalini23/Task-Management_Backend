@@ -19,6 +19,7 @@ namespace Task_Management.Controllers
         public UsersController(TaskContext context)
         {
             _context = context;
+           
         }
 
         // GET: api/Users
@@ -53,6 +54,7 @@ namespace Task_Management.Controllers
             }
 
             _context.Entry(user).State = EntityState.Modified;
+            _context.Entry(user.Address).State = EntityState.Modified;
 
             try
             {

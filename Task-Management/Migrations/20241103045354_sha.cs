@@ -5,7 +5,7 @@
 namespace Task_Management.Migrations
 {
     /// <inheritdoc />
-    public partial class abi : Migration
+    public partial class sha : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
